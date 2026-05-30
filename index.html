@@ -7,30 +7,60 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+
     <style>
-        body { font-family: sans-serif; background: #f0f2f5; margin: 0; padding-bottom: 80px; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; margin: 0; padding-bottom: 80px; }
         .header { background: #e91e63; color: white; padding: 15px; text-align: center; }
-        .balance-card { background: white; margin: 15px; padding: 20px; border-radius: 10px; text-align: center; }
+        .balance-card { background: white; margin: 15px; padding: 20px; border-radius: 10px; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
         .menu-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; padding: 15px; }
-        .menu-card { background: white; padding: 15px; text-align: center; border-radius: 8px; }
+        .menu-card { background: white; padding: 15px; text-align: center; border-radius: 8px; cursor: pointer; }
         .nav-bar { position: fixed; bottom: 0; width: 100%; background: white; display: flex; justify-content: space-around; padding: 15px 0; border-top: 1px solid #ddd; }
+        button { background: #e91e63; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; margin: 5px; }
+        input, select { padding: 10px; width: 85%; margin: 5px; border-radius: 5px; border: 1px solid #ccc; }
+        #admin-panel { background: #f8d7da; padding: 15px; margin: 20px; border-radius: 10px; display: none; }
     </style>
 </head>
 <body>
-<div class="header"><h3>HGNICE পোর্টাল</h3></div>
-<div class="balance-card">
-    <p>ব্যালেন্স</p>
-    <h2 id="display-balance">৳ 40</h2>
-    <select id="method"><option>bKash</option><option>Nagad</option><option>USDT</option></select>
-    <input type="number" id="amount" placeholder="পরিমাণ">
-    <br><button onclick="alert('রিকোয়েস্ট সফল!')">ডিপোজিট</button>
+
+<div id="auth-container" style="padding: 40px; text-align: center;">
+    <h2>লগইন করুন</h2>
+    <input type="email" id="email" placeholder="ইমেইল"><br>
+    <input type="password" id="password" placeholder="পাসওয়ার্ড"><br>
+    <button onclick="logIn()">লগইন</button>
 </div>
-<div class="menu-grid">
-    <div class="menu-card">🎰 Slots</div>
-    <div class="menu-card">🦈 Fishing</div>
-    <div class="menu-card">⚽ Sports</div>
+
+<div id="main-content" style="display:none;">
+    <div class="header"><h3>HGNICE পোর্টাল</h3></div>
+    <div class="balance-card">
+        <p>ব্যালেন্স</p>
+        <h2 id="display-balance">৳ 0</h2>
+        <select id="method"><option>bKash</option><option>Nagad</option><option>USDT</option></select>
+        <input type="number" id="amount" placeholder="পরিমাণ">
+        <br>
+        <button onclick="processTransaction('ডিপোজিট')">ডিপোজিট</button>
+        <button onclick="processTransaction('উইথড্র')" style="background:#555;">উইথড্র</button>
+    </div>
+
+    <div id="admin-panel">
+        <h3>অ্যাডমিন: ব্যালেন্স আপডেট</h3>
+        <input type="text" id="targetUserId" placeholder="ইউজার UID">
+        <input type="number" id="newAmount" placeholder="নতুন ব্যালেন্স">
+        <button onclick="updateBalance()">আপডেট করুন</button>
+    </div>
+
+    <div class="menu-grid">
+        <div class="menu-card" onclick="alert('গেম লোড হচ্ছে...')">🎰 Slots</div>
+        <div class="menu-card" onclick="alert('গেম লোড হচ্ছে...')">🦈 Fishing</div>
+        <div class="menu-card" onclick="alert('গেম লোড হচ্ছে...')">⚽ Sports</div>
+    </div>
+
+    <div class="nav-bar">
+        <div onclick="document.getElementById('admin-panel').style.display='block'">🏠 হোম</div>
+        <div>📊 অ্যাক্টিভিটি</div>
+        <div onclick="logOut()">👤 লগআউট</div>
+    </div>
 </div>
-<div class="nav-bar"><div>🏠 হোম</div><div>📊 অ্যাক্টিভিটি</div><div>👤 অ্যাকাউন্ট</div></div>
+
 <script>
     const firebaseConfig = {
         apiKey: "AIzaSyAmmkzOVL03j4G-R1sU-Rs-zVXFHvSRvz8",
@@ -41,6 +71,28 @@
         appId: "1:201479161493:web:257e6c0d130390f7033d9c"
     };
     firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    function logIn() { auth.signInWithEmailAndPassword(document.getElementById('email').value, document.getElementById('password').value).catch(e => alert(e.message)); }
+    function logOut() { auth.signOut().then(() => location.reload()); }
+    function processTransaction(type) { alert(type + " রিকোয়েস্ট পাঠানো হয়েছে!"); }
+
+    function updateBalance() {
+        const uid = document.getElementById('targetUserId').value;
+        const bal = document.getElementById('newAmount').value;
+        db.collection("users").doc(uid).update({ balance: parseInt(bal) }).then(() => alert("আপডেট সফল!"));
+    }
+
+    auth.onAuthStateChanged((user) => {
+        if (user) {
+            document.getElementById("auth-container").style.display = "none";
+            document.getElementById("main-content").style.display = "block";
+            db.collection("users").doc(user.uid).get().then((doc) => {
+                if (doc.exists) document.getElementById("display-balance").innerText = "৳ " + doc.data().balance;
+            });
+        }
+    });
 </script>
 </body>
 </html>
