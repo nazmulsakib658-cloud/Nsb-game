@@ -1,1 +1,46 @@
-
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HGNICE Gaming Portal</title>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+    <style>
+        body { font-family: sans-serif; background: #f0f2f5; margin: 0; padding-bottom: 80px; }
+        .header { background: #e91e63; color: white; padding: 15px; text-align: center; }
+        .balance-card { background: white; margin: 15px; padding: 20px; border-radius: 10px; text-align: center; }
+        .menu-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; padding: 15px; }
+        .menu-card { background: white; padding: 15px; text-align: center; border-radius: 8px; }
+        .nav-bar { position: fixed; bottom: 0; width: 100%; background: white; display: flex; justify-content: space-around; padding: 15px 0; border-top: 1px solid #ddd; }
+    </style>
+</head>
+<body>
+<div class="header"><h3>HGNICE পোর্টাল</h3></div>
+<div class="balance-card">
+    <p>ব্যালেন্স</p>
+    <h2 id="display-balance">৳ 40</h2>
+    <select id="method"><option>bKash</option><option>Nagad</option><option>USDT</option></select>
+    <input type="number" id="amount" placeholder="পরিমাণ">
+    <br><button onclick="alert('রিকোয়েস্ট সফল!')">ডিপোজিট</button>
+</div>
+<div class="menu-grid">
+    <div class="menu-card">🎰 Slots</div>
+    <div class="menu-card">🦈 Fishing</div>
+    <div class="menu-card">⚽ Sports</div>
+</div>
+<div class="nav-bar"><div>🏠 হোম</div><div>📊 অ্যাক্টিভিটি</div><div>👤 অ্যাকাউন্ট</div></div>
+<script>
+    const firebaseConfig = {
+        apiKey: "AIzaSyAmmkzOVL03j4G-R1sU-Rs-zVXFHvSRvz8",
+        authDomain: "my-new-project-39095.firebaseapp.com",
+        projectId: "my-new-project-39095",
+        storageBucket: "my-new-project-39095.firebasestorage.app",
+        messagingSenderId: "201479161493",
+        appId: "1:201479161493:web:257e6c0d130390f7033d9c"
+    };
+    firebase.initializeApp(firebaseConfig);
+</script>
+</body>
+</html>
